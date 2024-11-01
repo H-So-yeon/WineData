@@ -6,9 +6,10 @@ let wineData;
 let purpleShades = [];
 let ellipses = [];
 let selectedTitles = []; // 선택된 국가의 와인 타이틀을 저장할 배열
-let minDiameter = 32; // 최소 타원 크기
-let maxDiameter = 320; // 최대 타원 크기
-let selectedEllipse = null; // 선택된 타원의 정보 저장
+let minDiameter = 32; 
+let maxDiameter = 320;
+let selectedEllipse = null; //
+let button;
 
 function preload() {
   wineGlass = loadImage('glass.png');
@@ -47,13 +48,37 @@ function setup() {
     color(110,5,94,150),
     color(92,4,87,150),
     color(72,2,74,150),
-    color(108, 5,45,150)
-
+    color(108, 5,45,150),
+    color(138, 28, 95, 150),
+    color(212, 15, 166, 150),
+    color(150, 3, 156, 150)
   ];
 
-  let countries = wineData.getColumn("Country");
+
+
+  // Button
+  button = createButton('Go to Other');
+  button.position(width/2.1, height*0.95);
+  button.style('background-color', 'transparent'); 
+  button.style('border', '2px solid #c4cca2');       
+  button.style('color', '#000');                   
+  button.style('padding', '5px 10px');           
+  button.style('font-size', '18px');               
+  button.style('border-radius', '0px');
+  button.style('font-family', 'Crimson Text');
+  button.style('color', '#c4cca2');
+  button.style('cursor', 'pointer');
+
+  button.mousePressed(() => {
+    window.location.href = 'https://www.naver.com';
+  });
+
+
 
   // 나라별 비율 계산
+
+  let countries = wineData.getColumn("Country").filter(country => country.trim() !== '');
+
   let countryCount = {};
   countries.forEach(country => {
     if (country) {
@@ -75,43 +100,48 @@ function setup() {
 
   maskImage.loadPixels();
 
+  let colorIndex = 0;
+
   for (let i = 0; i < uniqueCountries.length; i++) {
     let x, y;
     let validPosition = false;
     let attempts = 0;
-    let maxAttempts = 100;
-
+    let maxAttempts = 100000;
+  
     // 각 나라의 비율에 따라 타원의 크기 설정
-    let productionPercent = countryPercentage[uniqueCountries[i]];
+    let productionPercent = countryPercentage[uniqueCountries[i]] || 0; // undefined일 경우 0으로 설정
     let diameter = map(productionPercent, 0, 100, minDiameter, maxDiameter);
-    let radius = diameter / 2; // 타원의 반지름
-
+    let radius = diameter / 2;
+  
     while (!validPosition && attempts < maxAttempts) {
       x = random(glassX - maskWidth / 2 + radius, glassX + maskWidth / 2 - radius);
       y = random(glassY - maskHeight / 2 + radius, glassY + maskHeight / 2 - radius);
       attempts++;
-
+  
       let localX = int(map(x, glassX - maskWidth / 2, glassX + maskWidth / 2, 0, maskImage.width));
       let localY = int(map(y, glassY - maskHeight / 2, glassY + maskHeight / 2, 0, maskImage.height));
       let pixelIndex = 4 * (localY * maskImage.width + localX);
       let brightness = maskImage.pixels[pixelIndex];
-
+  
       if (brightness === 0) { // 검은색 영역이면 와인잔 내부로 간주
         validPosition = true;
-
+  
         // 기존의 타원들과의 거리 체크하여 겹침 방지
         for (let j = 0; j < ellipses.length; j++) {
           let other = ellipses[j];
           let distance = dist(x, y, other.x, other.y);
-          if (distance < (radius + other.diameter / 2)) {
+          if (distance < (radius + other.diameter / 2 - 1)) {
             validPosition = false;
             break;
           }
         }
       }
     }
-
+  
     if (validPosition) {
+      let color = purpleShades[colorIndex];
+      colorIndex = (colorIndex + 1) % purpleShades.length;
+
       ellipses.push({
         x: x,
         y: y,
@@ -132,14 +162,17 @@ function draw() {
   textAlign(LEFT);
   textStyle(NORMAL);
   fill(196, 204, 162);
+
+  //Title
   text("Wine Data Visualization", width*0.01, 30);
 
+  //My Name
   textSize(20);
   textAlign(RIGHT);
   text("Anna Hwang", width*0.99, height*0.97);
 
   
-  
+  //Wine Glass Image
   let glassX = width / 2;
   let glassY = height / 3.5;
 
@@ -174,9 +207,12 @@ function draw() {
   drawingContext.shadowBlur = 0;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0)';
 
+  //Deco Grape
   image(grape1, width*0.15, height*0.85, grape1.width/1.5, grape1.height/1.5);
   image(grape2, width*0.85, height*0.15, grape1.width/1.5, grape1.height/1.5);
 
+
+  //Info Ellipse
   for (let i = 0; i < ellipses.length; i++) {
     let e = ellipses[i];
     
@@ -240,11 +276,11 @@ function mousePressed() {
 
     if (d < e.diameter / 2) {
       selectedEllipse = e; // 클릭한 타원의 정보 저장
-      e.color = color(135, 0, 20); // 선택된 타원의 색상을 red로 변경
+      e.color = color(135, 0, 20);
 
-      // 선택된 국가의 와인 타이틀 10개 가져오기
+      //Wine List
       let countryTitles = wineData.findRows(e.country, "Country").map(row => row.get("Title"));
-      selectedTitles = countryTitles.slice(0, 10); // 최대 10개만 저장
+      selectedTitles = countryTitles.slice(0, 10);
       break;
     }
   }
