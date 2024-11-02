@@ -70,7 +70,7 @@ function setup() {
   button.style('cursor', 'pointer');
 
   button.mousePressed(() => {
-    window.location.href = 'https://www.naver.com';
+    window.location.href = 'https://gehna-goel.github.io/mm621project2/';
   });
 
 
