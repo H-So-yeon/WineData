@@ -57,8 +57,8 @@ function setup() {
 
 
   // Button
-  button = createButton('Go to Other');
-  button.position(width/2.1, height*0.95);
+  button = createButton("Go to Gehna's project");
+  button.position((width - button.width) / 2, height*0.95);
   button.style('background-color', 'transparent'); 
   button.style('border', '2px solid #c4cca2');       
   button.style('color', '#000');                   
@@ -85,6 +85,7 @@ function setup() {
       countryCount[country] = (countryCount[country] || 0) + 1;
     }
   });
+
   let total = countries.length;
   let countryPercentage = {};
   for (let country in countryCount) {
@@ -98,6 +99,7 @@ function setup() {
   let maskHeight = height * 0.39;
   let maskWidth = (maskImage.width / maskImage.height) * maskHeight;
 
+  //Ellipse Area : chat gpt
   maskImage.loadPixels();
 
   let colorIndex = 0;
@@ -108,8 +110,8 @@ function setup() {
     let attempts = 0;
     let maxAttempts = 100000;
   
-    // 각 나라의 비율에 따라 타원의 크기 설정
-    let productionPercent = countryPercentage[uniqueCountries[i]] || 0; // undefined일 경우 0으로 설정
+    // ellipse size
+    let productionPercent = countryPercentage[uniqueCountries[i]] || 0; // undefined = 0
     let diameter = map(productionPercent, 0, 100, minDiameter, maxDiameter);
     let radius = diameter / 2;
   
@@ -123,10 +125,10 @@ function setup() {
       let pixelIndex = 4 * (localY * maskImage.width + localX);
       let brightness = maskImage.pixels[pixelIndex];
   
-      if (brightness === 0) { // 검은색 영역이면 와인잔 내부로 간주
+      if (brightness === 0) { // black > valid area
         validPosition = true;
   
-        // 기존의 타원들과의 거리 체크하여 겹침 방지
+        // prevent overlap
         for (let j = 0; j < ellipses.length; j++) {
           let other = ellipses[j];
           let distance = dist(x, y, other.x, other.y);
@@ -164,7 +166,12 @@ function draw() {
   fill(196, 204, 162);
 
   //Title
-  text("Wine Data Visualization", width*0.01, 30);
+  text("Wine Data Visualization", width*0.01, height*0.03);
+
+  textSize(20);
+  textAlign(CENTER);
+  fill(207, 207, 207);
+  text("click the ellipse", width/2, height*0.06);
 
   //My Name
   textSize(20);
@@ -174,7 +181,7 @@ function draw() {
   
   //Wine Glass Image
   let glassX = width / 2;
-  let glassY = height / 3.5;
+  let glassY = height / 2;
 
   let imgHeight = height * 0.85;
   let imgWidth = (wineGlass.width / wineGlass.height) * imgHeight;
@@ -199,7 +206,7 @@ function draw() {
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.24)';
 
   // Glass Image
-  image(wineGlass, glassX, glassY + 190, imgWidth, imgHeight);
+  image(wineGlass, glassX, glassY, imgWidth, imgHeight);
   
   // Clear Shadow
   drawingContext.shadowOffsetX = 0;
@@ -208,8 +215,8 @@ function draw() {
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0)';
 
   //Deco Grape
-  image(grape1, width*0.15, height*0.85, grape1.width/1.5, grape1.height/1.5);
-  image(grape2, width*0.85, height*0.15, grape1.width/1.5, grape1.height/1.5);
+  image(grape1, 250, height*0.85, grape1.width/1.5, grape1.height/1.5);
+  image(grape2, width - 250, height*0.15, grape1.width/1.5, grape1.height/1.5);
 
 
   //Info Ellipse
@@ -228,7 +235,7 @@ function draw() {
   }
 
   
-  // 선택된 타원이 있을 때, 정보와 타이틀 목록 표시
+  // select ellipse > Couantry name]
   if (selectedEllipse) {
     fill(18, 7, 1);
     textSize(80);
@@ -249,7 +256,7 @@ function draw() {
     textSize(30);
     text("Wine List", width * 0.675, height * 0.37);
 
-    // 선택된 타원의 국가에서 가져온 타이틀 목록 표시
+    // Country Title
     textSize(18);
     let yOffset = height * 0.43;
     selectedTitles.forEach((title, index) => {
