@@ -269,20 +269,20 @@ function draw() {
 
 
 function mousePressed() {
-  // 모든 타원의 색상을 초기 색상(purpleShades)으로 리셋
+  // reset to purpleshades
   ellipses.forEach((e, i) => {
     e.color = purpleShades[i % purpleShades.length];
   });
 
-  selectedEllipse = null; // 선택된 타원 초기화
-  selectedTitles = []; // 선택된 국가의 와인 타이틀 초기화
+  selectedEllipse = null;
+  selectedTitles = [];
 
   for (let i = 0; i < ellipses.length; i++) {
     let e = ellipses[i];
     let d = dist(mouseX, mouseY, e.x, e.y);
 
     if (d < e.diameter / 2) {
-      selectedEllipse = e; // 클릭한 타원의 정보 저장
+      selectedEllipse = e;
       e.color = color(135, 0, 20);
 
       //Wine List
